@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="SideBar">
+        <attr name="text_size" format="dimension" />
+        <attr name="text_color" format="color" />
+        <attr name="touch_color" format="color" />
+        <attr name="untouch_color" format="color" />
+    </declare-styleable>
+</resources>
