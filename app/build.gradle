@@ -29,4 +29,5 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile project(':groupindexlib')
     compile 'com.android.support:design:25.3.1'
+    compile 'com.othershe:BaseAdapter:1.1.5'
 }
