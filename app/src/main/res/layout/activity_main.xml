@@ -16,9 +16,7 @@
         android:layout_width="20dp"
         android:layout_height="match_parent"
         android:layout_alignParentRight="true"
-        android:layout_centerVertical="true"
-        app:text_size="14sp"
-        app:touch_color="@color/colorAccent" />
+        android:layout_centerVertical="true" />
 
     <TextView
         android:id="@+id/tip"

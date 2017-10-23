@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Rect;
 import android.support.annotation.Nullable;
 import android.text.TextPaint;
 import android.util.AttributeSet;
@@ -14,17 +13,15 @@ import android.view.View;
 
 public class SideBar extends View {
 
-    private int LETTER_COLOR = Color.BLUE;//索引字符颜色
+    private int INDEX_COLOR = Color.BLACK;//索引字符颜色
     private int TOUCH_COLOR = Color.parseColor("#88888888");//SideBar被触摸时的背景色
     private int UNTOUCH_COLOR = Color.TRANSPARENT;//SideBar默认背景色
-    private int LETTER_SIZE = (int) TypedValue.applyDimension(
-            TypedValue.COMPLEX_UNIT_SP, 12, getResources().getDisplayMetrics());
+    private int INDEX_SIZE = (int) TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_SP, 14, getResources().getDisplayMetrics());
 
     //索引字符数组
     public String[] indexArray = {"↑", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J",
             "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "#"};
-
-    private Context mContext;
 
     private int mWidth;//字符所在区域宽度
     private float mHeight;//字符所在区域高度
@@ -50,15 +47,14 @@ public class SideBar extends View {
     }
 
     private void init(Context context, AttributeSet attrs) {
-        mContext = context;
 
         TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.SideBar, 0, 0);
         for (int i = 0; i < ta.getIndexCount(); i++) {
             int attr = ta.getIndex(i);
             if (attr == R.styleable.SideBar_text_size) {
-                LETTER_SIZE = ta.getDimensionPixelSize(attr, LETTER_SIZE);
+                INDEX_SIZE = ta.getDimensionPixelSize(attr, INDEX_SIZE);
             } else if (attr == R.styleable.SideBar_text_color) {
-                LETTER_COLOR = ta.getColor(attr, LETTER_COLOR);
+                INDEX_COLOR = ta.getColor(attr, INDEX_COLOR);
             } else if (attr == R.styleable.SideBar_touch_color) {
                 TOUCH_COLOR = ta.getColor(attr, TOUCH_COLOR);
             } else if (attr == R.styleable.SideBar_untouch_color) {
@@ -68,8 +64,8 @@ public class SideBar extends View {
         ta.recycle();
 
         mTextPaint = new TextPaint();
-        mTextPaint.setColor(LETTER_COLOR);
-        mTextPaint.setTextSize(LETTER_SIZE);
+        mTextPaint.setColor(INDEX_COLOR);
+        mTextPaint.setTextSize(INDEX_SIZE);
         mTextPaint.setAntiAlias(true);
         setBackgroundColor(UNTOUCH_COLOR);
     }
@@ -109,10 +105,10 @@ public class SideBar extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         for (int i = 0; i < indexArray.length; i++) {
-            String letter = indexArray[i];
-            float x = (mWidth - mTextPaint.measureText(letter)) / 2;
-            float y = mMarginTop + mHeight * i + (mHeight + getTextHeight(letter)) / 2;//(mTextPaint.descent() - mTextPaint.ascent())
-            canvas.drawText(letter, x, y, mTextPaint);
+            String index = indexArray[i];
+            float x = (mWidth - mTextPaint.measureText(index)) / 2;
+            float y = mMarginTop + mHeight * i + (mHeight + Utils.getTextHeight(mTextPaint, index)) / 2;//(mTextPaint.descent() - mTextPaint.ascent())
+            canvas.drawText(index, x, y, mTextPaint);
         }
     }
 
@@ -126,7 +122,7 @@ public class SideBar extends View {
                 if (pos >= 0 && pos < indexArray.length) {
                     setBackgroundColor(TOUCH_COLOR);
                     if (onSideBarTouchListener != null) {
-                        onSideBarTouchListener.onTouch(indexArray[pos], pos);
+                        onSideBarTouchListener.onTouch(indexArray[pos]);
                     }
                 }
                 break;
@@ -143,28 +139,16 @@ public class SideBar extends View {
     }
 
     /**
-     * 测量字符高度
-     *
-     * @param text
-     * @return
-     */
-    public int getTextHeight(String text) {
-        Rect bounds = new Rect();
-        mTextPaint.getTextBounds(text, 0, text.length(), bounds);
-        return bounds.height();
-    }
-
-    /**
      * 计算索引字符的最大宽度、高度
      */
     private void getMaxTextSize() {
-        for (String letter : indexArray) {
-            maxWidth = (int) Math.max(maxWidth, mTextPaint.measureText(letter));
-            maxHeight = Math.max(maxHeight, getTextHeight(letter));
+        for (String index : indexArray) {
+            maxWidth = (int) Math.max(maxWidth, mTextPaint.measureText(index));
+            maxHeight = Math.max(maxHeight, Utils.getTextHeight(mTextPaint, index));
         }
     }
 
-    public void setIndexArray(String[] indexArray) {
+    public void setIndexsArray(String[] indexArray) {
         this.indexArray = indexArray;
     }
 

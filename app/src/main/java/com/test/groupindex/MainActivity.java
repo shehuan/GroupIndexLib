@@ -4,13 +4,16 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
 import com.othershe.groupindexlib.GroupIndexItemDecoration;
 import com.othershe.groupindexlib.ItemData;
+import com.othershe.groupindexlib.OnGroupHeaderViewListener;
 import com.othershe.groupindexlib.OnSideBarTouchListener;
 import com.othershe.groupindexlib.SideBar;
+import com.othershe.groupindexlib.ViewHolder;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -48,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
         datas.add(data7);
         ItemData data8 = new ItemData("AK47", "A");
         datas.add(data8);
-        ItemData data9 = new ItemData("JJJ", "J");
+        ItemData data9 = new ItemData("OK", "O");
         datas.add(data9);
         ItemData data10 = new ItemData("Web", "W");
         datas.add(data10);
@@ -62,9 +65,9 @@ public class MainActivity extends AppCompatActivity {
         datas.add(data14);
         ItemData data15 = new ItemData("WWW", "W");
         datas.add(data15);
-        ItemData data16 = new ItemData("Jiaozi", "J");
+        ItemData data16 = new ItemData("OPPO", "O");
         datas.add(data16);
-        ItemData data17 = new ItemData("Jack", "J");
+        ItemData data17 = new ItemData("Only", "O");
         datas.add(data17);
         ItemData data18 = new ItemData("Baidu", "B");
         datas.add(data18);
@@ -74,6 +77,8 @@ public class MainActivity extends AppCompatActivity {
         datas.add(data20);
         ItemData data21 = new ItemData("Biu", "B");
         datas.add(data21);
+        ItemData data22 = new ItemData("Cat", "C");
+        datas.add(data22);
 
         Collections.sort(datas, new Comparator<ItemData>() {
             @Override
@@ -95,15 +100,15 @@ public class MainActivity extends AppCompatActivity {
 
         sideBar.setOnSideBarTouchListener(new OnSideBarTouchListener() {
             @Override
-            public void onTouch(String letter, int position) {
+            public void onTouch(String index) {
                 tip.setVisibility(View.VISIBLE);
-                tip.setText(letter);
-                if (position == 0){
+                tip.setText(index);
+                if ("↑".equals(index)) {
                     layoutManager.scrollToPositionWithOffset(0, 0);
                     return;
                 }
                 for (int i = 0; i < datas.size(); i++) {
-                    if (datas.get(i).getTag().equals(letter)) {
+                    if (datas.get(i).getTag().equals(index)) {
                         layoutManager.scrollToPositionWithOffset(i, 0);
                         return;
                     }
