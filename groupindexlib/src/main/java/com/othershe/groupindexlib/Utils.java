@@ -4,6 +4,8 @@ import android.content.Context;
 import android.graphics.Rect;
 import android.text.TextPaint;
 
+import java.util.List;
+
 public class Utils {
     public static int sp2px(Context context, float spValue) {
         final float fontScale = context.getResources().getDisplayMetrics().scaledDensity;
@@ -25,5 +27,9 @@ public class Utils {
         Rect bounds = new Rect();
         textPaint.getTextBounds(text, 0, text.length(), bounds);
         return bounds.height();
+    }
+
+    public static boolean listIsEmpty(List<String> list) {
+        return list == null || list.size() == 0;
     }
 }

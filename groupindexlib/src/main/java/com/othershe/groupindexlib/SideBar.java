@@ -11,10 +11,12 @@ import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
 
+import java.util.List;
+
 public class SideBar extends View {
 
     private int INDEX_COLOR = Color.BLACK;//索引字符颜色
-    private int TOUCH_COLOR = Color.parseColor("#88888888");//SideBar被触摸时的背景色
+    private int TOUCH_COLOR = Color.parseColor("#88999999");//SideBar被触摸时的背景色
     private int UNTOUCH_COLOR = Color.TRANSPARENT;//SideBar默认背景色
     private int INDEX_SIZE = (int) TypedValue.applyDimension(
             TypedValue.COMPLEX_UNIT_SP, 14, getResources().getDisplayMetrics());
@@ -22,6 +24,8 @@ public class SideBar extends View {
     //索引字符数组
     public String[] indexArray = {"↑", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J",
             "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "#"};
+
+    private List<String> tags;
 
     private int mWidth;//字符所在区域宽度
     private float mHeight;//字符所在区域高度
@@ -117,12 +121,19 @@ public class SideBar extends View {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
             case MotionEvent.ACTION_MOVE:
-                // 按下字母的下标
+                // 选中字符的下标
                 int pos = (int) ((event.getY() - mMarginTop) / mHeight);
                 if (pos >= 0 && pos < indexArray.length) {
                     setBackgroundColor(TOUCH_COLOR);
                     if (onSideBarTouchListener != null) {
-                        onSideBarTouchListener.onTouch(indexArray[pos]);
+                        for (int i = 0; i < tags.size(); i++) {
+                            if (indexArray[pos].equals(tags.get(i))) {
+                                onSideBarTouchListener.onTouch(indexArray[pos], i);
+                                break;
+                            } else {
+                                onSideBarTouchListener.onTouch(indexArray[pos], -1);
+                            }
+                        }
                     }
                 }
                 break;
@@ -152,7 +163,8 @@ public class SideBar extends View {
         this.indexArray = indexArray;
     }
 
-    public void setOnSideBarTouchListener(OnSideBarTouchListener onSideBarTouchListener) {
+    public void setOnSideBarTouchListener(List<String> tags, OnSideBarTouchListener onSideBarTouchListener) {
+        this.tags = tags;
         this.onSideBarTouchListener = onSideBarTouchListener;
     }
 }

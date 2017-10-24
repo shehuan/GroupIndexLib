@@ -9,7 +9,6 @@ import android.support.annotation.LayoutRes;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextPaint;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 
@@ -18,7 +17,7 @@ import java.util.List;
 public class GroupIndexItemDecoration extends RecyclerView.ItemDecoration {
     private Context mContext;
 
-    private List<ItemData> datas;
+    private List<String> tags;//列表数据源的tag集合
     private int groupHeaderHeight;//GroupIndex高度
     private int groupHeaderLeftPadding;//GroupIndex高度左边的padding
     private boolean show = true;//是否显示顶部悬浮的GroupIndex
@@ -36,11 +35,11 @@ public class GroupIndexItemDecoration extends RecyclerView.ItemDecoration {
 
         mPaint = new Paint();
         mPaint.setAntiAlias(true);
-        mPaint.setColor(Color.parseColor("#FFDDDDDD"));
+        mPaint.setColor(Color.parseColor("#FFEEEEEE"));
 
         mTextPaint = new TextPaint();
         mTextPaint.setAntiAlias(true);
-        mTextPaint.setColor(Color.parseColor("#FF888888"));
+        mTextPaint.setColor(Color.parseColor("#FF999999"));
         mTextPaint.setTextSize(Utils.sp2px(context, 14));
     }
 
@@ -56,14 +55,9 @@ public class GroupIndexItemDecoration extends RecyclerView.ItemDecoration {
         }
 
         int position = parent.getChildAdapterPosition(view);
-        if (position == 0) {
-            //给cp等于0的itemView设置padding值
+        //itemView的position==0 或者 当前itemView的data的tag和上一个itemView的不相等，则为当前itemView设置top padding值
+        if (!Utils.listIsEmpty(tags) && (position == 0 || !tags.get(position).equals(tags.get(position - 1)))) {
             outRect.set(0, groupHeaderHeight, 0, 0);
-        } else if (datas.get(position).getTag() != null && !datas.get(position).getTag().equals(datas.get(position - 1).getTag())) {
-            //当前itemView的data的tag和上一个item的不相等，则为当前itemView设置padding值
-            outRect.set(0, groupHeaderHeight, 0, 0);
-        } else {
-            outRect.set(0, 0, 0, 0);
         }
     }
 
@@ -72,26 +66,27 @@ public class GroupIndexItemDecoration extends RecyclerView.ItemDecoration {
         super.onDraw(c, parent, state);
         for (int i = 0; i < parent.getChildCount(); i++) {
             View view = parent.getChildAt(i);
-            int cp = parent.getChildAdapterPosition(view);
+            int position = parent.getChildAdapterPosition(view);
             //和getItemOffsets()里的条件判断类似，开始绘制分组item的头
-            if (cp == 0 || (datas.get(cp).getTag() != null && !datas.get(cp).getTag().equals(datas.get(cp - 1).getTag()))) {
-                drawGroupHeader(c, parent, view, cp);
+            if (!Utils.listIsEmpty(tags) && (position == 0 || !tags.get(position).equals(tags.get(position - 1)))) {
+                drawGroupHeader(c, parent, view, position);
             }
         }
     }
 
     @Override
     public void onDrawOver(Canvas c, RecyclerView parent, RecyclerView.State state) {
+        super.onDrawOver(c, parent, state);
         if (!show) {
             return;
         }
         //列表第一个可见的itemView位置
         int position = ((LinearLayoutManager) (parent.getLayoutManager())).findFirstVisibleItemPosition();
-        String tag = datas.get(position).getTag();
+        String tag = tags.get(position);
         View view = parent.findViewHolderForAdapterPosition(position).itemView;
         //当前itemView的data的tag和下一个itemView的不相等，则代表将要重新绘制悬停的item的头
         boolean flag = false;
-        if (!TextUtils.isEmpty(tag) && !tag.equals(datas.get(position + 1).getTag())) {
+        if (!Utils.listIsEmpty(tags) && (position + 1) < tags.size() && !tag.equals(tags.get(position + 1))) {
             if (view.getBottom() <= groupHeaderHeight) {
                 c.save();
                 flag = true;
@@ -113,7 +108,7 @@ public class GroupIndexItemDecoration extends RecyclerView.ItemDecoration {
         int bottom = view.getTop() - params.topMargin;
         int top = bottom - groupHeaderHeight;
         c.drawRect(left, top, right, bottom, mPaint);
-        String tag = datas.get(position).getTag();
+        String tag = tags.get(position);
         int x = left + groupHeaderLeftPadding;
         int y = top + (groupHeaderHeight + Utils.getTextHeight(mTextPaint, tag)) / 2;
         c.drawText(tag, x, y, mTextPaint);
@@ -127,7 +122,7 @@ public class GroupIndexItemDecoration extends RecyclerView.ItemDecoration {
         int top = bottom - groupHeaderHeight;
 
         View view1 = LayoutInflater.from(mContext).inflate(layoutId, null, false);
-        groupHeaderViewListener.onViewConvert(ViewHolder.create(view1), datas.get(position).getTag());
+        groupHeaderViewListener.onViewConvert(ViewHolder.create(view1), tags.get(position));
         int widthMeasureSpec = View.MeasureSpec.makeMeasureSpec(right - left, View.MeasureSpec.EXACTLY);
         int heightMeasureSpec = View.MeasureSpec.makeMeasureSpec(groupHeaderHeight, View.MeasureSpec.EXACTLY);
         view1.measure(widthMeasureSpec, heightMeasureSpec);
@@ -180,13 +175,18 @@ public class GroupIndexItemDecoration extends RecyclerView.ItemDecoration {
         return this;
     }
 
+    public GroupIndexItemDecoration setGroupHeaderColor(String groupHeaderColor) {
+        mPaint.setColor(Color.parseColor(groupHeaderColor));
+        return this;
+    }
+
     public GroupIndexItemDecoration setGroupHeaderHeight(int groupHeaderHeight) {
         this.groupHeaderHeight = Utils.dip2px(mContext, groupHeaderHeight);
         return this;
     }
 
-    public GroupIndexItemDecoration setDatas(List<ItemData> datas) {
-        this.datas = datas;
+    public GroupIndexItemDecoration setTags(List<String> tags) {
+        this.tags = tags;
         return this;
     }
 
