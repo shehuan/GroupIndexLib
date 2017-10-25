@@ -111,7 +111,7 @@ public class SideBar extends View {
         for (int i = 0; i < indexArray.length; i++) {
             String index = indexArray[i];
             float x = (mWidth - mTextPaint.measureText(index)) / 2;
-            float y = mMarginTop + mHeight * i + (mHeight + Utils.getTextHeight(mTextPaint, index)) / 2;//(mTextPaint.descent() - mTextPaint.ascent())
+            float y = mMarginTop + mHeight * i + (mHeight + Utils.getTextHeight(mTextPaint, index)) / 2;
             canvas.drawText(index, x, y, mTextPaint);
         }
     }

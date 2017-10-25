@@ -9,7 +9,11 @@ import java.util.List;
 
 public abstract class SortHelper<T extends BaseItem> {
 
-
+    /**
+     * 按照列表中data指定指定字段进行字母升序排列
+     *
+     * @param datas
+     */
     public void sortByLetter(List<T> datas) {
         for (T data : datas) {
 
@@ -37,6 +41,11 @@ public abstract class SortHelper<T extends BaseItem> {
         });
     }
 
+    /**
+     * 从已排序的列表中提取tag
+     * @param datas
+     * @return
+     */
     public List<String> getTags(List<T> datas) {
         List<String> tags = new ArrayList<>();
         for (BaseItem data : datas) {
