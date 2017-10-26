@@ -17,7 +17,7 @@ allprojects {
 **Step 2. 添加项目依赖**
 ``` gradle
 dependencies {
-        compile 'com.github.Othershe:GroupIndex:1.0.0'
+        compile 'com.github.Othershe:GroupIndexLib:1.0.0'
 }
 ```
 **Step 3.设置ItemDecoration**
