@@ -48,7 +48,7 @@ recyclerView.addItemDecoration(new GroupHeaderItemDecoration(this)
         .setGroupHeaderTextColor("#FF999999")//设置GroupHeader的上的文字颜色
         .setGroupHeaderTextSize(12))//设置GroupHeader上的文字尺寸
         .showSuspensionGroupHeader(flase)////默认显示
-        //自定义绘制GroupHeader，可参考代码中的例子
+        //如果需要自定义绘制GroupHeader，可重写该接口的方法，代码中有例子
         .setOnDrawItemDecorationListener(new OnDrawItemDecorationListener() {
              @Override
              public void onDrawGroupHeader(Canvas c, Paint paint, TextPaint textPaint, int[] params, int position) {
