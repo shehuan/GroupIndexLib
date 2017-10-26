@@ -1,4 +1,4 @@
-package com.othershe.groupindexlib;
+package com.othershe.groupindexlib.decoration;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -10,20 +10,25 @@ import android.support.v7.widget.RecyclerView;
 import android.text.TextPaint;
 import android.view.View;
 
+import com.othershe.groupindexlib.helper.Utils;
+import com.othershe.groupindexlib.listener.OnDrawItemDecorationListener;
+
 import java.util.List;
 
-public class GroupIndexItemDecoration extends RecyclerView.ItemDecoration {
+public class GroupHeaderItemDecoration extends RecyclerView.ItemDecoration {
     private Context mContext;
 
     private List<String> tags;//列表数据源的tag集合
-    private int groupHeaderHeight;//GroupIndex高度
-    private int groupHeaderLeftPadding;//GroupIndex高度左边的padding
-    private boolean show = true;//是否显示顶部悬浮的GroupIndex
+    private int groupHeaderHeight;//GroupHeader高度
+    private int groupHeaderLeftPadding;//GroupHeader的左padding
+    private boolean show = true;//是否显示顶部悬浮的GroupHeader
 
     private Paint mPaint;
     private TextPaint mTextPaint;
 
-    public GroupIndexItemDecoration(Context context) {
+    private OnDrawItemDecorationListener drawItemDecorationListener;
+
+    public GroupHeaderItemDecoration(Context context) {
         mContext = context;
         groupHeaderHeight = Utils.dip2px(context, 20);
 
@@ -49,7 +54,7 @@ public class GroupIndexItemDecoration extends RecyclerView.ItemDecoration {
         }
 
         int position = parent.getChildAdapterPosition(view);
-        //itemView的position==0 或者 当前itemView的data的tag和上一个itemView的不相等，则为当前itemView设置top padding值
+        //ItemView的position==0 或者 当前itemView的data的tag和上一个ItemView的不相等，则为当前itemView设置top 偏移量
         if (!Utils.listIsEmpty(tags) && (position == 0 || !tags.get(position).equals(tags.get(position - 1)))) {
             outRect.set(0, groupHeaderHeight, 0, 0);
         }
@@ -62,9 +67,13 @@ public class GroupIndexItemDecoration extends RecyclerView.ItemDecoration {
             View view = parent.getChildAt(i);
             int position = parent.getChildAdapterPosition(view);
             String tag = tags.get(position);
-            //和getItemOffsets()里的条件判断类似，开始绘制分组item的头
+            //和getItemOffsets()里的条件判断类似，开始绘制分组的GroupHeader
             if (!Utils.listIsEmpty(tags) && (position == 0 || !tag.equals(tags.get(position - 1)))) {
-                drawGroupHeader(c, parent, view, tag);
+                if (drawItemDecorationListener == null) {
+                    drawGroupHeader(c, parent, view, tag);
+                } else {
+                    drawItemDecorationListener.onDrawGroupHeader(c, mPaint, mTextPaint, getGroupHeaderCoordinate(parent, view), position);
+                }
             }
         }
     }
@@ -75,13 +84,15 @@ public class GroupIndexItemDecoration extends RecyclerView.ItemDecoration {
         if (!show) {
             return;
         }
-        //列表第一个可见的itemView位置
+        //列表第一个可见的ItemView位置
         int position = ((LinearLayoutManager) (parent.getLayoutManager())).findFirstVisibleItemPosition();
         String tag = tags.get(position);
+        //第一个可见的ItemView
         View view = parent.findViewHolderForAdapterPosition(position).itemView;
-        //当前itemView的data的tag和下一个itemView的不相等，则代表将要重新绘制悬停的item的头
+        //当前ItemView的data的tag和下一个ItemView的不相等，则代表将要重新绘制悬停的GroupHeader
         boolean flag = false;
         if (!Utils.listIsEmpty(tags) && (position + 1) < tags.size() && !tag.equals(tags.get(position + 1))) {
+            //如果第一个可见ItemView的底部坐标小于groupHeaderHeight，则执行Canvas垂直位移操作
             if (view.getBottom() <= groupHeaderHeight) {
                 c.save();
                 flag = true;
@@ -89,73 +100,97 @@ public class GroupIndexItemDecoration extends RecyclerView.ItemDecoration {
             }
         }
 
-        drawSuspensionGroupHeader(c, parent, tag);
+        if (drawItemDecorationListener == null) {
+            drawSuspensionGroupHeader(c, parent, tag);
+        } else {
+            drawItemDecorationListener.onDrawSuspensionGroupHeader(c, mPaint, mTextPaint, getSuspensionGroupHeaderCoordinate(parent), position);
+        }
 
         if (flag) {
             c.restore();
         }
     }
 
-    private void drawGroupHeader(Canvas c, RecyclerView parent, View view, String tag) {
+    public int[] getGroupHeaderCoordinate(RecyclerView parent, View view) {
         RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) view.getLayoutParams();
         int left = parent.getPaddingLeft();
         int right = parent.getWidth() - parent.getPaddingRight();
         int bottom = view.getTop() - params.topMargin;
         int top = bottom - groupHeaderHeight;
-        c.drawRect(left, top, right, bottom, mPaint);
-        int x = left + groupHeaderLeftPadding;
-        int y = top + (groupHeaderHeight + Utils.getTextHeight(mTextPaint, tag)) / 2;
+        return new int[]{left, top, right, bottom};
+    }
+
+    private void drawGroupHeader(Canvas c, RecyclerView parent, View view, String tag) {
+        int[] params = getGroupHeaderCoordinate(parent, view);
+        c.drawRect(params[0], params[1], params[2], params[3], mPaint);
+        int x = params[0] + groupHeaderLeftPadding;
+        int y = params[1] + (groupHeaderHeight + Utils.getTextHeight(mTextPaint, tag)) / 2;
         c.drawText(tag, x, y, mTextPaint);
     }
 
-    private void drawSuspensionGroupHeader(Canvas c, RecyclerView parent, String tag) {
+    public int[] getSuspensionGroupHeaderCoordinate(RecyclerView parent) {
         int left = parent.getPaddingLeft();
         int right = parent.getWidth() - parent.getPaddingRight();
         int bottom = groupHeaderHeight;
         int top = 0;
-        c.drawRect(left, top, right, bottom, mPaint);
-        int x = left + groupHeaderLeftPadding;
-        int y = top + (groupHeaderHeight + Utils.getTextHeight(mTextPaint, tag)) / 2;
+        return new int[]{left, top, right, bottom};
+    }
+
+    private void drawSuspensionGroupHeader(Canvas c, RecyclerView parent, String tag) {
+        int[] params = getSuspensionGroupHeaderCoordinate(parent);
+        c.drawRect(params[0], params[1], params[2], params[3], mPaint);
+        int x = params[0] + groupHeaderLeftPadding;
+        int y = params[1] + (groupHeaderHeight + Utils.getTextHeight(mTextPaint, tag)) / 2;
         c.drawText(tag, x, y, mTextPaint);
     }
 
-    public GroupIndexItemDecoration setGroupHeaderLeftPadding(int groupHeaderLeftPadding) {
+    public GroupHeaderItemDecoration setGroupHeaderLeftPadding(int groupHeaderLeftPadding) {
         this.groupHeaderLeftPadding = Utils.dip2px(mContext, groupHeaderLeftPadding);
         return this;
     }
 
-    public GroupIndexItemDecoration setGroupHeaderTextColor(int groupHeaderTextColor) {
+    public GroupHeaderItemDecoration setGroupHeaderTextColor(int groupHeaderTextColor) {
         mTextPaint.setColor(groupHeaderTextColor);
         return this;
     }
 
-    public GroupIndexItemDecoration setGroupHeaderTextSize(int groupHeaderTextSize) {
+    public GroupHeaderItemDecoration setGroupHeaderTextColor(String groupHeaderTextColor) {
+        mTextPaint.setColor(Color.parseColor(groupHeaderTextColor));
+        return this;
+    }
+
+    public GroupHeaderItemDecoration setGroupHeaderTextSize(int groupHeaderTextSize) {
         mTextPaint.setTextSize(groupHeaderTextSize);
         return this;
     }
 
-    public GroupIndexItemDecoration setGroupHeaderColor(int groupHeaderColor) {
+    public GroupHeaderItemDecoration setGroupHeaderColor(int groupHeaderColor) {
         mPaint.setColor(groupHeaderColor);
         return this;
     }
 
-    public GroupIndexItemDecoration setGroupHeaderColor(String groupHeaderColor) {
+    public GroupHeaderItemDecoration setGroupHeaderColor(String groupHeaderColor) {
         mPaint.setColor(Color.parseColor(groupHeaderColor));
         return this;
     }
 
-    public GroupIndexItemDecoration setGroupHeaderHeight(int groupHeaderHeight) {
+    public GroupHeaderItemDecoration setGroupHeaderHeight(int groupHeaderHeight) {
         this.groupHeaderHeight = Utils.dip2px(mContext, groupHeaderHeight);
         return this;
     }
 
-    public GroupIndexItemDecoration setTags(List<String> tags) {
+    public GroupHeaderItemDecoration setTags(List<String> tags) {
         this.tags = tags;
         return this;
     }
 
-    public GroupIndexItemDecoration showSuspensionGroupIndex(boolean show) {
+    public GroupHeaderItemDecoration showSuspensionGroupHeader(boolean show) {
         this.show = show;
+        return this;
+    }
+
+    public GroupHeaderItemDecoration setOnDrawItemDecorationListener(OnDrawItemDecorationListener drawItemDecorationListener) {
+        this.drawItemDecorationListener = drawItemDecorationListener;
         return this;
     }
 }

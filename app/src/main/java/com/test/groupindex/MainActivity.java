@@ -1,36 +1,46 @@
 package com.test.groupindex;
 
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextPaint;
 import android.view.View;
 import android.widget.TextView;
 
-import com.othershe.groupindexlib.DivideItemDecoration;
-import com.othershe.groupindexlib.GroupIndexItemDecoration;
-import com.othershe.groupindexlib.OnGroupHeaderViewListener;
-import com.othershe.groupindexlib.OnSideBarTouchListener;
-import com.othershe.groupindexlib.SideBar;
-import com.othershe.groupindexlib.SortHelper;
-import com.othershe.groupindexlib.ViewHolder;
+import com.othershe.groupindexlib.decoration.DivideItemDecoration;
+import com.othershe.groupindexlib.decoration.GroupHeaderItemDecoration;
+import com.othershe.groupindexlib.helper.Utils;
+import com.othershe.groupindexlib.listener.OnDrawItemDecorationListener;
+import com.othershe.groupindexlib.listener.OnSideBarTouchListener;
+import com.othershe.groupindexlib.weiget.SideBar;
+import com.othershe.groupindexlib.helper.SortHelper;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
+    private Context context;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        RecyclerView list = (RecyclerView) findViewById(R.id.list);
+        context = this;
+
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.list);
         SideBar sideBar = (SideBar) findViewById(R.id.side_bar);
         final TextView tip = (TextView) findViewById(R.id.tip);
 
         final List<ItemData> datas = new ArrayList<>();
-        ItemData data = new ItemData("北京");
+        final ItemData data = new ItemData("北京");
         datas.add(data);
         ItemData data1 = new ItemData("上海");
         datas.add(data1);
@@ -110,18 +120,48 @@ public class MainActivity extends AppCompatActivity {
             }
         };
         sortHelper.sortByLetter(datas);
-        List<String> tags = sortHelper.getTags(datas);
+        final List<String> tags = sortHelper.getTags(datas);
 
         MyAdapter adapter = new MyAdapter(this, datas, false);
         final LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-        list.setLayoutManager(layoutManager);
-        list.addItemDecoration(new DivideItemDecoration().setTags(tags));
-        list.addItemDecoration(new GroupIndexItemDecoration(this)
+        recyclerView.setLayoutManager(layoutManager);
+
+        recyclerView.addItemDecoration(new GroupHeaderItemDecoration(this)
                 .setTags(tags)
                 .setGroupHeaderHeight(30)
-                .setGroupHeaderLeftPadding(20));
-        list.setAdapter(adapter);
+                .setGroupHeaderLeftPadding(20)
+//                .setOnDrawItemDecorationListener(new OnDrawItemDecorationListener() {
+//                    @Override
+//                    public void onDrawGroupHeader(Canvas c, Paint paint, TextPaint textPaint, int[] params, int position) {
+//                        c.drawRect(params[0], params[1], params[2], params[3], paint);
+//
+//                        int x = params[0] + Utils.dip2px(context, 20);
+//                        int y = params[1] + (Utils.dip2px(context, 30) + Utils.getTextHeight(textPaint, tags.get(position))) / 2;
+//
+//                        Bitmap icon = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher, null);
+//                        Bitmap icon1 = Bitmap.createScaledBitmap(icon, Utils.dip2px(context, 20), Utils.dip2px(context, 20), true);
+//                        c.drawBitmap(icon1, x, params[1] + Utils.dip2px(context, 5), paint);
+//
+//                        c.drawText(tags.get(position), x + Utils.dip2px(context, 25), y, textPaint);
+//                    }
+//
+//                    @Override
+//                    public void onDrawSuspensionGroupHeader(Canvas c, Paint paint, TextPaint textPaint, int[] params, int position) {
+//                        c.drawRect(params[0], params[1], params[2], params[3], paint);
+//                        int x = params[0] + Utils.dip2px(context, 20);
+//                        int y = params[1] + (Utils.dip2px(context, 30) + Utils.getTextHeight(textPaint, tags.get(position))) / 2;
+//
+//                        Bitmap icon = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher, null);
+//                        Bitmap icon1 = Bitmap.createScaledBitmap(icon, Utils.dip2px(context, 20), Utils.dip2px(context, 20), true);
+//                        c.drawBitmap(icon1, x, params[1] + Utils.dip2px(context, 5), paint);
+//
+//                        c.drawText(tags.get(position), x + Utils.dip2px(context, 25), y, textPaint);
+//                    }
+//                })
+        );
+        recyclerView.addItemDecoration(new DivideItemDecoration().setTags(tags));
+        recyclerView.setAdapter(adapter);
 
         sideBar.setOnSideBarTouchListener(tags, new OnSideBarTouchListener() {
             @Override

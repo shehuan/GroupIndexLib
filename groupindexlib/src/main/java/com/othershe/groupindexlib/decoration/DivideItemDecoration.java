@@ -1,4 +1,4 @@
-package com.othershe.groupindexlib;
+package com.othershe.groupindexlib.decoration;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -7,6 +7,8 @@ import android.graphics.Rect;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+
+import com.othershe.groupindexlib.helper.Utils;
 
 import java.util.List;
 
@@ -35,7 +37,7 @@ public class DivideItemDecoration extends RecyclerView.ItemDecoration {
 
         int position = parent.getChildAdapterPosition(view);
         if (!Utils.listIsEmpty(tags) && (position + 1) < tags.size() && tags.get(position).equals(tags.get(position + 1))) {
-            //当前itemView的data的tag和下一个item的不相等，则为当前itemView设置bottom padding值
+            //当前ItemView的data的tag和下一个ItemView的不相等，则为当前ItemView设置bottom 偏移量
             outRect.set(0, 0, 0, divideHeight);
         }
     }

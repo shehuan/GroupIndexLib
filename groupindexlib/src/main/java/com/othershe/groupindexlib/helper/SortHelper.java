@@ -1,6 +1,7 @@
-package com.othershe.groupindexlib;
+package com.othershe.groupindexlib.helper;
 
 import com.github.promeg.pinyinhelper.Pinyin;
+import com.othershe.groupindexlib.bean.BaseItem;
 
 import java.util.ArrayList;
 import java.util.Collections;

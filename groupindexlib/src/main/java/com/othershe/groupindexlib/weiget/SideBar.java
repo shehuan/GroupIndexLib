@@ -1,4 +1,4 @@
-package com.othershe.groupindexlib;
+package com.othershe.groupindexlib.weiget;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -10,6 +10,10 @@ import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
+
+import com.othershe.groupindexlib.R;
+import com.othershe.groupindexlib.helper.Utils;
+import com.othershe.groupindexlib.listener.OnSideBarTouchListener;
 
 import java.util.List;
 
@@ -110,7 +114,7 @@ public class SideBar extends View {
     protected void onDraw(Canvas canvas) {
         for (int i = 0; i < indexArray.length; i++) {
             String index = indexArray[i];
-            float x = (mWidth - mTextPaint.measureText(index)) / 2;
+            float x = (mWidth - Utils.getTextWidth(mTextPaint, index)) / 2;
             float y = mMarginTop + mHeight * i + (mHeight + Utils.getTextHeight(mTextPaint, index)) / 2;
             canvas.drawText(index, x, y, mTextPaint);
         }

@@ -1,6 +1,6 @@
 package com.test.groupindex;
 
-import com.othershe.groupindexlib.BaseItem;
+import com.othershe.groupindexlib.bean.BaseItem;
 
 public class ItemData extends BaseItem {
 

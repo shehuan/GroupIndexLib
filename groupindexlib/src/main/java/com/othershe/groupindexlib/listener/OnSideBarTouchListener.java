@@ -1,4 +1,4 @@
-package com.othershe.groupindexlib;
+package com.othershe.groupindexlib.listener;
 
 public interface OnSideBarTouchListener {
     /**

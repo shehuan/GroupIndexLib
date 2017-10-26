@@ -1,4 +1,4 @@
-package com.othershe.groupindexlib;
+package com.othershe.groupindexlib.helper;
 
 import android.content.Context;
 import android.graphics.Rect;
@@ -27,6 +27,17 @@ public class Utils {
         Rect bounds = new Rect();
         textPaint.getTextBounds(text, 0, text.length(), bounds);
         return bounds.height();
+    }
+
+    /**
+     * 测量字符宽度
+     *
+     * @param textPaint
+     * @param text
+     * @return
+     */
+    public static int getTextWidth(TextPaint textPaint, String text) {
+        return (int) textPaint.measureText(text);
     }
 
     public static boolean listIsEmpty(List<String> list) {

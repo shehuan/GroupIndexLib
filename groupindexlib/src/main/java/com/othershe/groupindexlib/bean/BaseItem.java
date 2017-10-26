@@ -1,4 +1,4 @@
-package com.othershe.groupindexlib;
+package com.othershe.groupindexlib.bean;
 
 public class BaseItem {
     private String tag;

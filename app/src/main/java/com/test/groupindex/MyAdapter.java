@@ -4,7 +4,6 @@ import android.content.Context;
 
 import com.othershe.baseadapter.ViewHolder;
 import com.othershe.baseadapter.base.CommonBaseAdapter;
-import com.othershe.groupindexlib.BaseItem;
 
 import java.util.List;
 
