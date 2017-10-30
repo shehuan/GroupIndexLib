@@ -35,6 +35,8 @@ public class SideBar extends View {
     private float mHeight;//字符所在区域高度
     private float mMarginTop;//顶部间距
 
+    private int lastPos = -1;//记录上次触摸的索引字符pos
+
     private TextPaint mTextPaint;
 
     private int maxWidth, maxHeight;
@@ -127,14 +129,19 @@ public class SideBar extends View {
             case MotionEvent.ACTION_MOVE:
                 // 选中字符的下标
                 int pos = (int) ((event.getY() - mMarginTop) / mHeight);
+                if (pos == lastPos) {
+                    return true;
+                }
                 if (pos >= 0 && pos < indexArray.length) {
+                    lastPos = pos;
                     setBackgroundColor(TOUCH_COLOR);
                     if (onSideBarTouchListener != null) {
                         for (int i = 0; i < tags.size(); i++) {
                             if (indexArray[pos].equals(tags.get(i))) {
                                 onSideBarTouchListener.onTouch(indexArray[pos], i);
                                 break;
-                            } else {
+                            }
+                            if (i == tags.size() - 1) {
                                 onSideBarTouchListener.onTouch(indexArray[pos], -1);
                             }
                         }
@@ -143,6 +150,7 @@ public class SideBar extends View {
                 break;
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
+                lastPos = -1;
                 setBackgroundColor(UNTOUCH_COLOR);
                 if (onSideBarTouchListener != null) {
                     onSideBarTouchListener.onTouchEnd();
