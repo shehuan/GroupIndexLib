@@ -45,6 +45,10 @@ public class GroupHeaderItemDecoration extends RecyclerView.ItemDecoration {
     @Override
     public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
         super.getItemOffsets(outRect, view, parent, state);
+        if (Utils.listIsEmpty(tags)) {
+            return;
+        }
+
         RecyclerView.LayoutManager manager = parent.getLayoutManager();
 
         //只处理线性垂直类型的列表
@@ -55,7 +59,7 @@ public class GroupHeaderItemDecoration extends RecyclerView.ItemDecoration {
 
         int position = parent.getChildAdapterPosition(view);
         //ItemView的position==0 或者 当前itemView的data的tag和上一个ItemView的不相等，则为当前itemView设置top 偏移量
-        if (!Utils.listIsEmpty(tags) && (position == 0 || !tags.get(position).equals(tags.get(position - 1)))) {
+        if (position == 0 || !tags.get(position).equals(tags.get(position - 1))) {
             outRect.set(0, groupHeaderHeight, 0, 0);
         }
     }
@@ -63,12 +67,15 @@ public class GroupHeaderItemDecoration extends RecyclerView.ItemDecoration {
     @Override
     public void onDraw(Canvas c, RecyclerView parent, RecyclerView.State state) {
         super.onDraw(c, parent, state);
+        if (Utils.listIsEmpty(tags)) {
+            return;
+        }
         for (int i = 0; i < parent.getChildCount(); i++) {
             View view = parent.getChildAt(i);
             int position = parent.getChildAdapterPosition(view);
             String tag = tags.get(position);
             //和getItemOffsets()里的条件判断类似，开始绘制分组的GroupHeader
-            if (!Utils.listIsEmpty(tags) && (position == 0 || !tag.equals(tags.get(position - 1)))) {
+            if (position == 0 || !tag.equals(tags.get(position - 1))) {
                 if (drawItemDecorationListener == null) {
                     drawGroupHeader(c, parent, view, tag);
                 } else {
@@ -81,6 +88,10 @@ public class GroupHeaderItemDecoration extends RecyclerView.ItemDecoration {
     @Override
     public void onDrawOver(Canvas c, RecyclerView parent, RecyclerView.State state) {
         super.onDrawOver(c, parent, state);
+        if (Utils.listIsEmpty(tags)) {
+            return;
+        }
+
         if (!show) {
             return;
         }
@@ -91,7 +102,7 @@ public class GroupHeaderItemDecoration extends RecyclerView.ItemDecoration {
         View view = parent.findViewHolderForAdapterPosition(position).itemView;
         //当前ItemView的data的tag和下一个ItemView的不相等，则代表将要重新绘制悬停的GroupHeader
         boolean flag = false;
-        if (!Utils.listIsEmpty(tags) && (position + 1) < tags.size() && !tag.equals(tags.get(position + 1))) {
+        if ((position + 1) < tags.size() && !tag.equals(tags.get(position + 1))) {
             //如果第一个可见ItemView的底部坐标小于groupHeaderHeight，则执行Canvas垂直位移操作
             if (view.getBottom() <= groupHeaderHeight) {
                 c.save();

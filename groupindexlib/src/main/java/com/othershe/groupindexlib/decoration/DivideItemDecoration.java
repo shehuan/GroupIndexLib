@@ -27,6 +27,10 @@ public class DivideItemDecoration extends RecyclerView.ItemDecoration {
     @Override
     public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
         super.getItemOffsets(outRect, view, parent, state);
+        if (Utils.listIsEmpty(tags)) {
+            return;
+        }
+
         RecyclerView.LayoutManager manager = parent.getLayoutManager();
 
         //只处理线性垂直类型的列表
@@ -45,11 +49,14 @@ public class DivideItemDecoration extends RecyclerView.ItemDecoration {
     @Override
     public void onDraw(Canvas c, RecyclerView parent, RecyclerView.State state) {
         super.onDraw(c, parent, state);
+        if (Utils.listIsEmpty(tags)) {
+            return;
+        }
         for (int i = 0; i < parent.getChildCount(); i++) {
             View view = parent.getChildAt(i);
             int position = parent.getChildAdapterPosition(view);
             //和getItemOffsets()里的条件判断类似
-            if (!Utils.listIsEmpty(tags) && (position + 1) < tags.size() && tags.get(position).equals(tags.get(position + 1))) {
+            if ((position + 1) < tags.size() && tags.get(position).equals(tags.get(position + 1))) {
                 drawDivide(c, parent, view);
             }
         }
